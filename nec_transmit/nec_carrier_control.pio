@@ -1,0 +1,66 @@
+;
+; Copyright (c) 2021 mjcross
+;
+; SPDX-License-Identifier: BSD-3-Clause
+;
+
+
+.program nec_carrier_control
+
+; receive data from FIFO and transmit NEC IR frame (MSB first)
+;
+
+.define BURST_IRQ 7                     ; IRQ used to trigger carrier burst
+.define NUM_INITIAL_BURSTS 16
+
+
+.wrap_target
+    pull                                ; fetch data word into OSR (block if FIFO is empty)
+
+    set X, (NUM_INITIAL_BURSTS - 1)     ; do 9ms leading pulse
+long_burst:
+    irq BURST_IRQ
+    jmp X-- long_burst
+
+    nop [15]                            ; do 4.5ms space
+
+    irq BURST_IRQ [1]                   ; begin first data bit
+data_bit:
+    out X, 1                            ; shift bit out of OSR (protocol requires LSB first)
+    jmp !X burst                        ; short delay for '0'
+    nop [3]                             ; additonal delay for '1'
+burst:
+    irq BURST_IRQ
+jmp !OSRE data_bit                      ; loop until OSR is empty
+
+.wrap                                   ; fetch next data word
+
+
+% c-sdk {
+static inline void nec_carrier_control_program_init(PIO pio, uint sm, uint offset, float tick_rate, float bits_per_frame) {
+
+    // create new config with calculated wrap and wrap-target offsets
+    //
+    pio_sm_config c = nec_carrier_control_program_get_default_config(offset);
+
+    // add output shift register (OSR) configuration
+    //
+    sm_config_set_out_shift(&c,
+        true,      // shift right
+        false,      // autopull off
+        bits_per_frame);
+
+    // add clock divider configuration (2 SM ticks per burst period)
+    //
+    float div = clock_get_hz(clk_sys) / tick_rate;
+    sm_config_set_clkdiv(&c, div);
+
+    // apply configuration to state machine and initialise instruction pointer
+    //
+    pio_sm_init(pio, sm, offset, &c);
+
+    // start state machine
+    //
+    pio_sm_set_enabled(pio, sm, true);
+}
+%}
