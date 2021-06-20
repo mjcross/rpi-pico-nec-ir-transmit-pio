@@ -7,7 +7,7 @@
 
 .program nec_carrier_control
 
-; receive data from FIFO and transmit NEC IR frame (MSB first)
+; receive data from FIFO and transmit NEC IR frame (LSB first)
 ;
 
 .define BURST_IRQ 7                     ; IRQ used to trigger carrier burst
@@ -37,7 +37,7 @@ jmp !OSRE data_bit                      ; loop until OSR is empty
 
 
 % c-sdk {
-static inline void nec_carrier_control_program_init(PIO pio, uint sm, uint offset, float tick_rate, float bits_per_frame) {
+static inline void nec_carrier_control_program_init(PIO pio, uint sm, uint offset, float tick_rate, int bits_per_frame) {
 
     // create new config with calculated wrap and wrap-target offsets
     //

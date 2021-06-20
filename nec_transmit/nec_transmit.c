@@ -27,8 +27,9 @@
 // public API definitions
 //
 int nec_tx_init(PIO pio, uint pin_num) {
-    // initialise PIO to transmit NEC IR frames on specificied GPIO pin
+    // initialise PIO to transmit NEC IR frames on specified GPIO pin
     // returns state machine number on success, otherwise -1 if an error occurred
+
     // load and run carrier burst program
     //
     uint carrier_burst_offset = pio_add_program(pio, &nec_carrier_burst_program);
