@@ -2,7 +2,7 @@
 A library and simple demo to transmit 'NEC' IR control codes using the PIO state machines on the Raspberry Pi PICO / RP2040, written in 'C' and PIO assembler.
 
 ## NOTE
-**This code (and the corresponding RECEIVE library) have now been incorporated into the RPi official repository, so this repository is no longer actively maintained. Please use [https://github.com/raspberrypi/pico-examples/tree/master/pio/ir_nec](https://github.com/raspberrypi/pico-examples/tree/master/pio/ir_nec) instead.
+**This code (and the corresponding RECEIVE library) have now been incorporated into the RPi official repository, so this repository is no longer actively maintained. Please use [https://github.com/raspberrypi/pico-examples/tree/master/pio/ir_nec](https://github.com/raspberrypi/pico-examples/tree/master/pio/ir_nec) instead.**
 
 ## Overview
 The library uses two of the eight state machines (SM) on the RP2040: one to generate bursts of 38kHz carrier and the other to construct and send frames of data.
